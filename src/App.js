@@ -5,30 +5,26 @@ import NewTask from "./components/NewTask/NewTask";
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const transformtask = (dataobj) => {
-    const loadedTasks = [];
 
-    for (const taskKey in dataobj) {
-      loadedTasks.push({ id: taskKey, text: dataobj[taskKey].text });
-    }
-
-    setTasks(loadedTasks);
-    console.log(tasks);
-  };
-  const {
-    isLoading,
-    error,
-    sendRequest: fetchTasks,
-  } = useHttp(
-    {
-      url: "https://http-task-f93ec-default-rtdb.firebaseio.com/tasks.json",
-    },
-    transformtask
-  );
+  const { isLoading, error, sendRequest: fetchTasks } = useHttp(); //using without passing parameters
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    const transformtask = (dataobj) => {
+      const loadedTasks = [];
+
+      for (const taskKey in dataobj) {
+        loadedTasks.push({ id: taskKey, text: dataobj[taskKey].text });
+      }
+
+      setTasks(loadedTasks);
+    };
+    fetchTasks(
+      {
+        url: "https://http-task-f93ec-default-rtdb.firebaseio.com/tasks.json",
+      },
+      transformtask
+    ); //send required data from here to remove infinite loop while using useEffect
+  }, [fetchTasks]);
 
   const taskAddHandler = (task) => {
     setTasks((prevTasks) => prevTasks.concat(task));
